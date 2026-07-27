@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import connectDB from "./config/db.js";
+import authRouter from "./routes/authRoutes.js";
 
 connectDB()
 
@@ -13,6 +14,7 @@ app.use(express.json())
 app.get("/", (req,res) => {
     res.send("Server is running!")
 })
+app.get('/api/auth', authRouter);
 
 const PORT = process.env.PORT || 5000;
 
