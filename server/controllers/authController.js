@@ -1,7 +1,7 @@
 
 // Register user
 
-import User from "../models/User";
+import User from "../models/User.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
@@ -24,7 +24,7 @@ export const register = async (req,res) => {
         const hashedPassword = await bcrypt.hash(password,await bcrypt.genSalt(10))
 
         // Create user
-        const user = await user.create({name,email,password: hashedPassword})
+        const user = await User.create({name,email,password: hashedPassword})
 
         const token = generateToken(user._id);
 
