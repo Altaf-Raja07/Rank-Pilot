@@ -120,7 +120,7 @@ export const getAnalysis = async (req, res) => {
 }
 
 // Get all analysis for user
-export const getAnalysss = async (req, res) => {
+export const getAnalyses = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;

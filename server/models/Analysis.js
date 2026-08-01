@@ -1,5 +1,29 @@
 import mongoose from "mongoose";
 
+const issueSchema = new mongoose.Schema({
+    severity: {
+        type: String,
+        enum: ["critical", "warning", "info"],
+        required: true
+    },
+
+    category: {
+        type: String,
+        required: true
+    },
+
+    message: {
+        type: String,
+        required: true
+    },
+
+    recommendation: {
+        type: String,
+        required: true
+    }
+
+}, { _id: false });
+
 const analysisSchema = new mongoose.Schema({
 
     userId: {

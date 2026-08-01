@@ -48,7 +48,7 @@ export async function scrapeUrl(url){
             const charset = charsetMeta ? charsetMeta.getAttribute("charset") || "" : "";
 
             const h1Elements = document.querySelectorAll("h1");
-            const h1Texts = Array.from(h1Elements).map((el) => el.textContent?.trim() || "").
+            const h1Texts = Array.from(h1Elements).map((el) => el.textContent?.trim() || "")
             const headings = {
                 h1: document.querySelectorAll("h1").length,
                 h2: document.querySelectorAll("h2").length,
