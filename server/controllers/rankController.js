@@ -136,7 +136,7 @@ export const toggleTracking = async (req, res) => {
             return res.status(404).json({ success: false, message: "Keyword tracking not found" });
         } 
 
-        tracking.isActive = !tracking.isActive;
+        tracking.active = !tracking.active;
         await tracking.save();
 
         res.status(200).json({ success: true, tracking });

@@ -9,6 +9,6 @@ rankRouter.get('/list', auth, getKeywords);
 rankRouter.get('/:id', auth, getKeyword);
 rankRouter.post('/:id/refresh', auth, refreshKeyword);
 rankRouter.put('/:id/toggle', auth, toggleTracking);
-rankRouter.detelet('/:id', auth, deleteKeyword);
+rankRouter.delete('/:id', auth, deleteKeyword);
 
 export default rankRouter;

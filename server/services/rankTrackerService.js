@@ -87,7 +87,7 @@ export async function rankTracker(keyword, targetDomain) {
                     r.position = allResults.length + 1;
                     allResults.push(r);
                     if(!found && (r.domain.toLowerCase().includes(cleanTarget) || cleanTarget.includes(r.domain.toLowerCase()))){
-                        found = {...r, page: gpage + 1};
+                        found = {...r, page: gPage + 1};
                     }
                 }
                 if(found) break;
@@ -96,7 +96,7 @@ export async function rankTracker(keyword, targetDomain) {
 
             // 6. Finalization: Close browser and extract competitors
             await browser.close();
-            const competitors = allResults.filter((r)=>!r.domain.toLowerCase().includes(cleanTarget)) && !cleanTarget.includes(r.domain.toLowerCase()).slice(0,10);
+            const competitors = allResults.filter((r) => !r.domain.toLowerCase().includes(cleanTarget)).slice(0, 10);
 
             return {
                 success: true,
