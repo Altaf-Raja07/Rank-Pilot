@@ -1,6 +1,30 @@
 import Analysis from "../models/Analysis.js";
 import { scrapeUrl } from "../services/scrapperService.js";
 import { analyzeSeoData } from "../services/geminiService.js";
+import dns from "dns/promises";
+import net from "net";
+
+const isPrivateIPv4 = (ip) => {
+    const parts = ip.split(".").map(Number);
+    if(parts.length !== 4 || parts.some((n) => isNaN(n) || n < 0 || n > 255)) return false;
+    const [a, b] = parts;
+    if(a === 0 || a === 10 || a === 127) return true;
+    if(a === 100 && b >= 64 && b <= 127) return true;
+    if(a === 169 && b === 254) return true;
+    if(a === 172 && b >= 16 && b <= 31) return true;
+    if(a === 192 && (b === 0 || b === 168)) return true;
+    if(a === 198 && (b === 18 || b === 19)) return true;
+    if(a >= 224) return true;
+    return false;
+};
+
+const isPrivateIPv6 = (ip) => {
+    const lower = ip.toLowerCase();
+    if(lower === "::" || lower === "::1" || lower.startsWith("::ffff:")) return true;
+    const group = lower.split(":")[0];
+    if(group.startsWith("fe") || group.startsWith("fc") || group.startsWith("fd")) return true;
+    return false;
+};
 
 // Analyze a URL
 export const analyzeUrl = async (req, res) => {
@@ -15,6 +39,32 @@ export const analyzeUrl = async (req, res) => {
         let validUrl;
         try {
             validUrl = new URL(url.startsWith("http")? url : `https://${url}`);
+            if(!["http:", "https:"].includes(validUrl.protocol)) throw new Error("Invalid protocol");
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid URL"
+            });
+        }
+
+        // Block SSRF targets (private/internal hostnames)
+        try {
+            const hostname = validUrl.hostname;
+            const ipVersion = net.isIP(hostname);
+            if(ipVersion === 4){
+                if(isPrivateIPv4(hostname)){
+                    return res.status(400).json({success: false, message: "URL is not accessible"});
+                }
+            } else if(ipVersion === 6){
+                if(isPrivateIPv6(hostname)){
+                    return res.status(400).json({success: false, message: "URL is not accessible"});
+                }
+            } else {
+                const addresses = await dns.lookup(hostname, {all: true});
+                if(addresses.some((addr) => net.isIPv4(addr.address) ? isPrivateIPv4(addr.address) : isPrivateIPv6(addr.address))){
+                    return res.status(400).json({success: false, message: "URL is not accessible"});
+                }
+            }
         } catch (error) {
             return res.status(400).json({
                 success: false,
@@ -153,7 +203,7 @@ export const getAnalyses = async (req, res) => {
 // Delete analysis
 export const deleteAnalysis = async (req, res) => {
     try {
-        await Analysis.findByIdAndDelete({ _id: req.params.id, userId: req.userId });
+        await Analysis.findOneAndDelete({ _id: req.params.id, userId: req.userId });
 
         res.json({
             success: true,

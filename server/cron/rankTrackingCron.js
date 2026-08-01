@@ -8,12 +8,16 @@ export function startRankTrackingCron() {
         try {
             const activeTrackings = await KeywordTracking.find({ active: true });
             for(const tracking of activeTrackings) {
-                tracking.status = "checking";
-                await tracking.save();
+                try {
+                    tracking.status = "checking";
+                    await tracking.save();
 
-                const result = await keywordTracking(tracking)
-                // Delay between checks to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 10000 + Math.random() * 5000));
+                    const result = await keywordTracking(tracking)
+                    // Delay between checks to avoid rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 10000 + Math.random() * 5000));
+                } catch (err) {
+                    console.error("Error tracking keyword:", err.message);
+                }
             }
         } catch (error) {
             console.error("Error in rank tracking cron job:", error.message);

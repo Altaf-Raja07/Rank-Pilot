@@ -113,7 +113,7 @@ export async function scrapeUrl(url){
             }
         })
 
-        const statusCode = response.status() || 0;
+        const statusCode = response ? response.status() : 0;
         await page.close();
         await browser.close();
         
@@ -136,5 +136,6 @@ export async function scrapeUrl(url){
                 console.error("[SCRAPPER] Failed to close browser", error.message);
             }
         }
+        return {success: false, error: error.message};
     }
 }

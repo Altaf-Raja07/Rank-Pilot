@@ -6,7 +6,7 @@ export const addKeyword = async (req,res) => {
     try {
         const {keyword, url} = req.body
 
-        if(!keyword || !url) return res.status(400).json({
+        if(!keyword || !keyword.trim() || !url) return res.status(400).json({
             success: false,
             message: "Keyword and URL are required"
         });
@@ -47,7 +47,7 @@ export const addKeyword = async (req,res) => {
             message: "Keyword added for tracking successfully",
             tracking: newKeywordTracking
         });
-        keywordTracking(newKeywordTracking); // Start tracking in the background
+        keywordTracking(newKeywordTracking).catch((err) => console.error("Keyword tracking error:", err.message)); // Start tracking in the background
 
 
     } catch (error) {
@@ -103,7 +103,7 @@ export const refreshKeyword = async (req, res) => {
         tracking.status = "checking";
         await tracking.save();
         res.status(200).json({ success: true, message: "Rank check started" });
-        keywordTracking(tracking);
+        keywordTracking(tracking).catch((err) => console.error("Keyword tracking error:", err.message));
     } catch (error) {
         console.error("Refresh keyword error:", error.message);
         res.status(500).json({ success: false, message: "Server error" });

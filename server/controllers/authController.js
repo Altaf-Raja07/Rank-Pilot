@@ -14,7 +14,7 @@ export const register = async (req,res) => {
     try {
         const {name,email,password} = req.body;
 
-        if(!name,!email,!password) return res.status(400).json({ success: false, message: "All fields are required"});
+        if(!name || !email || !password) return res.status(400).json({ success: false, message: "All fields are required"});
 
         // check if user exists
         const existingUser = await User.findOne({email})
@@ -26,6 +26,7 @@ export const register = async (req,res) => {
         // Create user
         const user = await User.create({name,email,password: hashedPassword})
 
+        user.password = undefined;
         const token = generateToken(user._id);
 
         res.status(201).json({success: true, token, user})
@@ -44,13 +45,14 @@ export const login = async (req, res) => {
         if (!email || !password) return res.status(400).json({ success: false, message: "All fields are required" });
 
         // find user
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email: email.trim().toLowerCase() })
         if (!user) return res.status(400).json({ success: false, message: "Invalid credentials" })
 
         // Check password
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) return res.status(400).json({ success: false, message: "Invalid credentials" })
 
+        user.password = undefined;
         const token = generateToken(user._id);
 
         res.status(200).json({ success: true, token, user })
