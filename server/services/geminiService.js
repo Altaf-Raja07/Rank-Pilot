@@ -120,7 +120,8 @@ export async function analyzeSeoData(scrapedData){
             }
         })
 
-        const analysis = JSON.parse(response.text)
+        const match = response.text.match(/\{[\s\S]*\}/);
+        const analysis = JSON.parse(match ? match[0] : response.text)
 
         return {success: true, data: analysis}
 
