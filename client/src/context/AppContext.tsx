@@ -1,4 +1,4 @@
-import Loading from "@/components/Loading";
+
 import type { AxiosInstance } from "axios";
 import axios from "axios";
 // import { config } from "node:process";
